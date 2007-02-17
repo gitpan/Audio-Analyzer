@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+lib/Audio/Analyzer.pm
+README
+Changes
+META.yml
