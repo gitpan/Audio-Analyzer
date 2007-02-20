@@ -1,6 +1,6 @@
 package Audio::Analyzer;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use strict;
 use warnings;
@@ -43,7 +43,7 @@ sub new {
 sub next {
 	my ($self) = @_;
 	my $pcm = $self->read_pcm;
-	my @mags;
+	my $chunk;
 
 	if (! defined($pcm)) {
 		return undef;
@@ -52,11 +52,9 @@ sub next {
 	my @samples = $self->convert_pcm($pcm);
 	my $channels = $self->split_channels(@samples);
 
-	for(my $i = 0; $i < scalar(@$channels); $i++) {
-		$mags[$i] = $self->do_fft($channels->[$i]);
-	}
+	$chunk = Audio::Analyzer::Chunk->new($self, $channels);
 
-	return \@mags;
+	return $chunk;
 }
 
 sub progress {
@@ -86,25 +84,6 @@ sub freqs {
 	$self->[FREQ_CACHE] = \@freqs;
 
 	return $self->[FREQ_CACHE];
-}
-
-sub combine {
-	my ($self, $channels) = @_;
-	my $num_channels = scalar(@$channels);
-	my $length = scalar(@{$channels->[0]});
-	my @new;
-
-	for(my $i = 0; $i < $length; $i++) {
-		my @row;
-
-		for(my $j = 0; $j < $num_channels; $j++) {
-			push(@row, $channels->[$j][$i]);	
-		}
-
-		$new[$i] = $self->rms(@row);
-	}
-
-	return \@new;
 }
 
 #private interface starts here
@@ -185,48 +164,6 @@ sub init {
 	return $self;
 }
 
-sub rms {
-	my $self = shift(@_);
-	my $size = scalar(@_);
-	my $sum;
-
-	for(my $i = 0; $i < $size; $i++) {
-		$sum += $_[$i] ** 2;
-	}
-
-	$sum /= $size;
-
-	return sqrt($sum);
-}
-
-sub do_fft {
-	my ($self, $samples) = @_;
-	my $fft = Math::FFT->new($samples);
-	my $coeff = $fft->rdft;
-	my $size = scalar(@$coeff);
-	my $k = 0;
-	my @mag;
-
-	$mag[$k] = sqrt($coeff->[$k*2]**2);
-
-	for($k = 1; $k < $size / 2; $k++) {
-		$mag[$k] = sqrt(($coeff->[$k * 2] ** 2) + ($coeff->[$k * 2 + 1] ** 2));
-	}
-
-	$self->scale(\@mag);
-
-	return \@mag;
-}
-
-sub scale {
-	my ($self, $mags) = @_;
-	my $scaler = $self->[SCALER];
-	
-	if (defined($scaler)) {
-		$scaler->scale($mags);
-	}
-}
-
 sub split_channels {
 	my ($self, @samples) = @_;
 	my $channels = $self->[CHANNELS];
@@ -240,6 +177,7 @@ sub split_channels {
 
 	return \@split;
 }
+
 
 #converts PCM into floating point representation
 sub convert_pcm {
@@ -302,9 +240,121 @@ sub read_pcm {
 	return $buf;
 }
 
+sub scaler {
+	my ($self) = @_;
+	
+	return $self->[SCALER];
+}
+
+package Audio::Analyzer::Chunk;
+
+our $VERSION = '0.02';
+
+use strict;
+use warnings;
+
+sub new {
+	my ($class, $analyzer, $channels) = @_;
+	my $self = {};
+
+	$self->{analyzer} = $analyzer;
+	$self->{channels} = $channels;
+
+	bless($self, $class);
+
+	return $self;
+}
+
+sub pcm {
+	my ($self) = @_;
+
+	return $self->{channels};
+}
+
+sub fft {
+	my ($self) = @_;
+	my $channels = $self->{channels};
+	my @mags;
+
+	for(my $i = 0; $i < scalar(@$channels); $i++) {
+		$mags[$i] = $self->do_fft($channels->[$i]);
+	}
+
+	return \@mags;
+}
+
+sub rms {
+	my $self = shift(@_);
+	my $size = scalar(@_);
+	my $sum;
+
+	for(my $i = 0; $i < $size; $i++) {
+		$sum += $_[$i] ** 2;
+	}
+
+	$sum /= $size;
+
+	return sqrt($sum);
+}
+
+sub combine_fft {
+	my ($self, $channels) = @_;
+	my $num_channels = scalar(@$channels);
+	my $length = scalar(@{$channels->[0]});
+	my @new;
+
+	for(my $i = 0; $i < $length; $i++) {
+		my @row;
+
+		for(my $j = 0; $j < $num_channels; $j++) {
+			push(@row, $channels->[$j][$i]);	
+		}
+
+		$new[$i] = $self->rms(@row);
+	}
+
+	return \@new;
+}
+
+sub analyzer {
+	my ($self) = @_;
+
+	return $self->{analyzer};
+}
+
+#private methods
+
+sub do_fft {
+	my ($self, $samples) = @_;
+	my $fft = Math::FFT->new($samples);
+	my $coeff = $fft->rdft;
+	my $size = scalar(@$coeff);
+	my $k = 0;
+	my @mag;
+
+	$mag[$k] = sqrt($coeff->[$k*2]**2);
+
+	for($k = 1; $k < $size / 2; $k++) {
+		$mag[$k] = sqrt(($coeff->[$k * 2] ** 2) + ($coeff->[$k * 2 + 1] ** 2));
+	}
+
+	$self->scale(\@mag);
+
+	return \@mag;
+}
+
+sub scale {
+	my ($self, $mags) = @_;
+	my $scaler = $self->analyzer->scaler;
+	
+	if (defined($scaler)) {
+		$scaler->scale($mags);
+	}
+}
+
 package Audio::Analyzer::ACurve;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use strict;
 use warnings;
@@ -378,7 +428,7 @@ sub scale {
 
 package Audio::Analyzer::AutoScaler;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use strict;
 use warnings;
@@ -428,7 +478,7 @@ Audio::Analyzer
 
   $analyzer = Audio::Analyzer->new(file => $source);
 
-  while(defined($readings = $analyzer->next)) {
+  while(defined($chunk = $analyzer->next)) {
     my $done = $analyzer->progress;
 
     print "$done% completed\n";
@@ -514,28 +564,45 @@ between 0 and 1, with 1 being a magnitude of the peak level.
 
 =back
 
-=item $channels = $analyzer->next;
+=item $chunk = $analyzer->next;
 
-Iterate once and return the output of the Fourier Transform after scaling. An
-array ref is returned which has each channel's worth of information in it, as
-another array ref; the values of the second ref are the magnitude of each 
-frequency. 
-
-=item $combined = $analyzer->combine($channels);
-
-Combine together 2 or more channels of readings into a single array ref. The
-returned ref contains the RMS of each of the channel specific readings.
+Iterate once and return a new chunk; see below for information on 
+Audio::Analyzer::Chunk.
 
 =item $freqs = $analyzer->freqs;
 
 Return an array reference of the frequency numbers that we analyze. This array
-ref is the same size as the output of $analyzer->next and serves to enumerate
-each position of that array.
+ref is the same size as the number of elements in each channel from $chunk->fft.
+
 
 =item $completed = $analyzer->progress;
 
-Return a number between 0 and 99 that represents in percent how far along in the file
-we have processed.
+Return a number between 0 and 99 that represents in percent how far along in 
+the file we have processed.
+
+=back
+
+=head1 CHUNK SYSTEM
+
+Instances of Audio::Analyzer::Chunk represent a set of PCM from the file. 
+Operations on instances of this class perform the FFT and access the PCM.
+
+=over 4
+
+=item $channels = $chunk->pcm;
+
+Return an array ref of channels; each array value is an array ref which contains
+the samples from the PCM converted to numbers between -1 and 1.
+
+=item $channels = $chunk->fft;
+
+Return an array ref of channels; each array value is an array ref which contains
+the magnitudes from the Fast Fourier Transform. Numbers are between 0 and 1.
+
+=item $combined = $chunk->combine($channels);
+
+Combine together 2 or more channels of FFT output into a single array ref. The
+returned ref contains the RMS of each of the channel specific readings.
 
 =back
 
