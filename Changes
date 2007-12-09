@@ -1,3 +1,5 @@
+0.03	Dec 9, 2007
+	* Slight documentation updates
 0.02	Feb 20 2007
 	* Added Audio::Analyzer::Chunk.
 	* Interface changes to support Audio::Analyzer::Chunk (sorry).

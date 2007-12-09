@@ -1,6 +1,6 @@
 package Audio::Analyzer;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use strict;
 use warnings;
@@ -492,10 +492,6 @@ Audio::Analyzer
 This module makes it easy to analyze music files with the Fast Fourier 
 Transform and sync the output of the FFT in time for visual representation.
 
-=head1 PLUG
-
-See http://musicwatcher.sf.net/ for programs that use this module.
-
 =head1 REFERENCE
 
 =over 4
@@ -618,6 +614,26 @@ the data returned by the FFT for one channel. The scaler modifies the data
 inside the array reference and does not return any value. 
 
 Your scaler class should also force all output to be between 0 and 1.
+
+=head1 EXAMPLE MEDIA
+
+The following pieces of media were done using Audio::Analyzer:
+
+=over 4 
+
+=item http://youtube.com/watch?v=C8EOtbaMT84 
+
+=item http://youtube.com/watch?v=QfhRVnv0bw4
+
+Templatized PovRay scenes written out one file per frame then rendered
+into images individually with a make file.
+
+=item http://youtube.com/watch?v=dNGi-SZ9kGw
+
+Imager::Graph graphs of the output of Audio::Analyzer and the internal 
+state of a software beat detector assembled with mencoder.  
+
+=back
 
 =head1 AUTHOR
 
