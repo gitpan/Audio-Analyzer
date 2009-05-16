@@ -1,3 +1,5 @@
+0.20 May 16, 2009
+    * Removed plug for musicwatcher from documentation
 0.1	May 18, 2008
 	* Added tests against a few moments of sin wave.
 	* Set version to 0.1 since things have been fairly stable.
