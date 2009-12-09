@@ -54,13 +54,13 @@ sub check_output {
 		foreach my $i (0 .. $len - 1) {
 			my $one = $data->[$i];
 
-			if ($one > .03) {
-				ok($i == 28, 'large value in proper band');
+			if ($one > .1) {
+				ok($i == 28, "large value in proper band: $i");
 
-				ok($one > 0.182, "lower bound ok: $one");
-				ok($one < 0.188, "upper bound ok: $one");
+				ok($one > 0.182, "lower bound ok: $one band: $i");
+				ok($one < 0.188, "upper bound ok: $one band: $i");
 			} else {
-				ok(1, "value is with in noise range: $one");
+				ok(1, "value is with in noise range: $one band: $i");
 			}
 		}
 	}

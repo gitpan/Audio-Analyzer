@@ -1,6 +1,6 @@
 package Audio::Analyzer;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21_01';
 
 use strict;
 use warnings;
@@ -467,7 +467,7 @@ __END__
 
 =head1 NAME
 
-Audio::Analyzer
+Audio::Analyzer - Makes using Math::FFT very easy
 
 =head1 SYNOPSIS
 
