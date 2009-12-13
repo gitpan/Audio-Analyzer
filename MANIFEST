@@ -3,7 +3,7 @@ MANIFEST
 lib/Audio/Analyzer.pm
 README
 Changes
-META.yml
 t/Audio-Analyzer.t
 t/1000hz.pcm
 t/1000hz.freq
+META.yml                                 Module meta-data (added by MakeMaker)

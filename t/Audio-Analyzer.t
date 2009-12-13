@@ -60,7 +60,7 @@ sub check_output {
 				ok($one > 0.182, "lower bound ok: $one band: $i");
 				ok($one < 0.188, "upper bound ok: $one band: $i");
 			} else {
-				ok(1, "value is with in noise range: $one band: $i");
+				ok($i != 28, "noise is in proper band: $one band: $i");
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Audio-Analyzer
-version:            0.21_01
+version:            0.21_02
 abstract:           Makes using Math::FFT very easy
 author:  []
 license:            unknown

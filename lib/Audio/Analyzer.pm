@@ -1,6 +1,6 @@
 package Audio::Analyzer;
 
-our $VERSION = '0.21_01';
+our $VERSION = '0.21_02';
 
 use strict;
 use warnings;
@@ -187,7 +187,7 @@ sub convert_pcm {
 
 	if ($bytes_per_sample == 2) {
 		while(length($pcm) >= 2) {
-			my $sample = unpack('s', substr($pcm, 0, 2, ''));
+			my $sample = unpack('s<', substr($pcm, 0, 2, ''));
 			push(@samples, $sample);
 		}
 	} else {
@@ -489,7 +489,7 @@ Audio::Analyzer - Makes using Math::FFT very easy
   
 =head1 DESCRIPTION
 
-This module makes it easy to analyze music files with the Fast Fourier 
+This module makes it easy to analyze audio files with the Fast Fourier 
 Transform and sync the output of the FFT in time for visual representation.
 
 =head1 REFERENCE
@@ -506,7 +506,9 @@ by %opts. The options available are:
 =item file
 
 A required option; must be either a string which is a filename or a reference
-to an already open filehandle.
+to an already open filehandle. The format must be little endian linear coded
+PCM using signed integers; this is the same format as a WAV file with the
+header ripped off. 
 
 =item dft_size
 
@@ -634,6 +636,11 @@ Imager::Graph graphs of the output of Audio::Analyzer and the internal
 state of a software beat detector assembled with mencoder.  
 
 =back
+
+=head1 LIMITATIONS
+
+In no way shape or form should this module be considered accurate or
+correct enough for actual scientific analysis.
 
 =head1 AUTHOR
 
