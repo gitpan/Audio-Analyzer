@@ -1,7 +1,7 @@
 --- #YAML:1.0
 name:               Audio-Analyzer
-version:            0.21_02
-abstract:           Makes using Math::FFT very easy
+version:            0.21
+abstract:           Makes using Math::FFT very easy for audio analysis 
 author:  []
 license:            unknown
 distribution_type:  module
@@ -16,7 +16,7 @@ no_index:
     directory:
         - t
         - inc
-generated_by:       ExtUtils::MakeMaker version 6.54
+generated_by:       ExtUtils::MakeMaker version 6.56
 meta-spec:
     url:      http://module-build.sourceforge.net/META-spec-v1.4.html
     version:  1.4

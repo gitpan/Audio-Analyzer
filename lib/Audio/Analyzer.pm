@@ -1,6 +1,6 @@
 package Audio::Analyzer;
 
-our $VERSION = '0.21_02';
+our $VERSION = '0.21';
 
 use strict;
 use warnings;
@@ -467,7 +467,7 @@ __END__
 
 =head1 NAME
 
-Audio::Analyzer - Makes using Math::FFT very easy
+Audio::Analyzer - Makes using Math::FFT very easy for audio analysis 
 
 =head1 SYNOPSIS
 
@@ -658,7 +658,13 @@ your bug as I make changes.
 
 =head2 Known Bugs
 
-No known bugs at this time. 
+=over 4
+
+=item This module is still not passing tests on all types of hardware. See
+http://cpantesters.org/distro/A/Audio-Analyzer.html for details on what is
+and is not passing. 
+
+=back
 
 Copyright 2007 Tyler Riddle, all rights reserved.
 
