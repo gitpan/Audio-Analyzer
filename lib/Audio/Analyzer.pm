@@ -1,6 +1,6 @@
 package Audio::Analyzer;
 
-our $VERSION = '0.22_01';
+our $VERSION = '0.22_02';
 
 use strict;
 use warnings;
@@ -677,7 +677,7 @@ The following pieces of media were done using Audio::Analyzer:
 
 =over 4 
 
-=item http://www.youtube.com/watch?v=W8Jk8rTP5l
+=item http://www.youtube.com/watch?v=W8Jk8rTP5lg
 
 =item http://www.youtube.com/watch?v=6yTEUBgvxs4
 
