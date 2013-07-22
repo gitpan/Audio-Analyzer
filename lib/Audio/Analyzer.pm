@@ -1,6 +1,6 @@
 package Audio::Analyzer;
 
-our $VERSION = '0.22_02';
+our $VERSION = '0.22';
 
 use strict;
 use warnings;
